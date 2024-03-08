@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: employees-replicaset
+  labels:
+    app: employees
+    version: v1
+spec:
+  replicas: 3  # Set the desired number of replicas
+  selector:
+    matchLabels:
+      app: employees
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: employees
+        component: frontend
+    spec:
+      imagePullSecrets:
+        - name: salman
+      containers:
+        - name: myemployees
+          image: 795985889962.dkr.ecr.us-east-1.amazonaws.com/salman:app_v1
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          env:
+            - name: DBPWD
+              valueFrom:
+                secretKeyRef:
+                  name: db-password
+                  key: password
+            - name: DBPORT
+              value: "3306"
+            - name: DBHOST
+              value: "database-service.sqldb.svc.cluster.local"
+            - name: DBUSER
+              value: "root"
+          ports:
+            - containerPort: 8080
+
